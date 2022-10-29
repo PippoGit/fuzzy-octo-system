@@ -77,8 +77,12 @@ const Home: NextPage = () => {
             <Image
               src={pokemonToGuess.sprite}
               alt="guess"
-              width={200}
-              height={200}
+              width={400}
+              height={400}
+              style={{
+                filter: "brightness(0%)",
+                imageRendering: "pixelated",
+              }}
             />
             <ul>
               {pokemons.map((pokemon) => (
