@@ -1,8 +1,13 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import localFont from '@next/font/local';
 
 import { useEffect, useState } from "react";
+
+
+export const pokeFont = localFont({ src: '../fonts/Pokemon.ttf', });
+
 
 interface Pokemon {
   name: string;
@@ -28,7 +33,7 @@ const fetchPokemon = async () => {
 
   const fullList = (await pokeApiList.json()) as PokeApiList;
   const randomPokemon = Math.floor(Math.random() * 150);
-  const apiList = fullList.results.slice(randomPokemon, randomPokemon + 5);
+  const apiList = fullList.results.slice(randomPokemon, randomPokemon + 4);
 
   await Promise.all(
     apiList.map(async (pokemon) => {
@@ -54,7 +59,7 @@ const Home: NextPage = () => {
     const fetchData = async () => {
       const response = await fetchPokemon();
       setPokemons(response);
-      setPokemonToGuess(response[Math.floor(Math.random() * 5)]);
+      setPokemonToGuess(response[Math.floor(Math.random() * 4)]);
     };
     fetchData();
   }, [isOver]);
@@ -67,12 +72,12 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
-        <h1 className="text-5xl font-extrabold leading-normal text-gray-700 md:text-[5rem]">
+      <main className={"container mx-auto flex min-h-screen flex-col items-center justify-center p-4 " + pokeFont.className}>
+        <h1 className="text-5xl font-extrabold leading-normal text-black md:text-[5rem]">
           PokéQuiz
         </h1>
         <p className="text-2xl text-gray-700">{"Who's That Pokemon?"}</p>
-        {pokemonToGuess && pokemons.length === 5 && (
+        {pokemonToGuess && pokemons.length === 4 && (
           <div className="align-center container flex flex-col items-center">
             <Image
               src={pokemonToGuess.sprite}
@@ -84,9 +89,16 @@ const Home: NextPage = () => {
                 imageRendering: "pixelated",
               }}
             />
-            <ul>
+            <ul className="grid grid-cols-2 gap-4">
               {pokemons.map((pokemon) => (
                 <li
+                  className="p-2 capitalize hover:translate-y-px"
+                  role="button"
+                  style={{
+                    borderImage: `url('/assets/frame.png') 42 round`,
+                    borderWidth: '21px',
+                    borderStyle: 'solid',
+                  }}
                   key={pokemon.name}
                   onClick={() => {
                     if (pokemon.name === pokemonToGuess?.name) {
