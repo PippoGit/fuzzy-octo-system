@@ -5,6 +5,7 @@ import { Choices } from "./Choices";
 import { CorrectGuess } from "./CorrectGuess";
 import { Pokedex } from "./Pokedex";
 import { PokemonToGuess } from "./PokemonToGuess";
+import { YouWin } from "./YouWin";
 
 export const Game = ({
   pokemonList,
@@ -31,6 +32,10 @@ export const Game = ({
   const pokemonToGuess = pokemonList[currentQuiz];
 
   if (!pokemonToGuess) return null;
+
+  if (pokedex.length === pokemonList.length) {
+    return <YouWin />;
+  }
 
   return (
     <div className="align-center container flex flex-col items-center">
