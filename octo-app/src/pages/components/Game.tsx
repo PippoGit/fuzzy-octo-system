@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import type { Pokemon } from "..";
+import { useHighScores } from "../../utils/high-scores";
 import { Choices } from "./Choices";
 import { CorrectGuess } from "./CorrectGuess";
 import { Pokedex } from "./Pokedex";
@@ -14,6 +15,8 @@ export const Game = ({
   pokemonList: Pokemon[];
   numChoices: number;
 }) => {
+  const { addHighScore } = useHighScores();
+
   const [isGameOver, setIsGameOver] = useState(false);
   const [guessRight, setGuessRight] = useState(false);
   const [currentQuiz, setCurrentQuiz] = useState(0);
