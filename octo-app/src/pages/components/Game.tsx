@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Pokemon } from "..";
 import { Choices } from "./Choices";
 import { Pokedex } from "./Pokedex";
@@ -15,6 +15,7 @@ export const Game = ({
   const [isGameOver, setIsGameOver] = useState(false);
   const [currentQuiz, setCurrentQuiz] = useState(0);
   const [pokedex, setPokedex] = useState<number[]>([]);
+  const [showPokemon, setShowPokemon] = useState(false);
 
   const getRandomPokemonOptions = useMemo(() => {
     const p = pokemonList.at(currentQuiz);
@@ -27,27 +28,35 @@ export const Game = ({
 
   const pokemonToGuess = pokemonList[currentQuiz];
 
-  if (getRandomPokemonOptions === undefined) return null;
-  if (!pokemonToGuess) return null;
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setShowPokemon(false);
+      setCurrentQuiz((currentQuiz) => currentQuiz + 1);
+    }, 2000);
 
-  if (isGameOver) {
-    return <div>GAMEOVER</div>;
-  }
+    return () => clearTimeout(timeout);
+  }, [pokedex]);
+
+  if (!pokemonToGuess) return null;
 
   return (
     <div className="align-center container flex flex-col items-center">
       <Pokedex pokedex={pokedex} total={pokemonList.length} />
-      <PokemonToGuess pokemon={pokemonToGuess} />
+      {isGameOver && (
+        <div> Oh no! That was a {pokemonToGuess.name}. Game over... </div>
+      )}
+      <PokemonToGuess pokemon={pokemonToGuess} show={showPokemon} />
       <Choices
         pokemons={getRandomPokemonOptions}
         onGuess={(id) => {
+          setShowPokemon(true);
           if (id === pokemonToGuess.id) {
             setPokedex((old) => [...old, pokemonToGuess.id]);
-            setCurrentQuiz((currentQuiz) => currentQuiz + 1);
           } else {
             setIsGameOver(true);
           }
         }}
+        disabled={isGameOver}
       />
     </div>
   );

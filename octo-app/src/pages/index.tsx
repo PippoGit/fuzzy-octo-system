@@ -5,6 +5,7 @@ import Head from "next/head";
 import { useQuery } from "@tanstack/react-query";
 import { Game } from "./components/Game";
 import _ from "lodash";
+import { useMemo } from "react";
 
 export const pokeFont = localFont({ src: "../fonts/Pokemon.ttf" });
 
@@ -50,7 +51,14 @@ const initGame = async () => {
 };
 
 const Home: NextPage = () => {
-  const { isLoading, data } = useQuery(["pokemon"], initGame);
+  const { isLoading, data, isFetching } = useQuery(["pokemon"], initGame, {
+    refetchOnWindowFocus: false,
+  });
+
+  const pokemonList = useMemo(() => {
+    if (!data) return [];
+    return _.shuffle(data);
+  }, [data]);
 
   return (
     <>
@@ -73,7 +81,7 @@ const Home: NextPage = () => {
         {!data || isLoading ? (
           <p>loading...</p>
         ) : (
-          <Game pokemonList={_.shuffle(data)} numChoices={MAX_CHOICES} />
+          <Game pokemonList={pokemonList} numChoices={MAX_CHOICES} />
         )}
       </main>
     </>

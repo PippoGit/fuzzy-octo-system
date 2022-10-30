@@ -3,9 +3,11 @@ import type { Pokemon } from "..";
 export const Choices = ({
   pokemons,
   onGuess,
+  disabled,
 }: {
   pokemons: Pokemon[];
   onGuess: (id: number) => void;
+  disabled: boolean;
 }) => {
   const toGuess = pokemons[0];
 
@@ -23,7 +25,7 @@ export const Choices = ({
             borderStyle: "solid",
           }}
           key={pokemon.id}
-          onClick={() => onGuess(pokemon.id)}
+          onClick={() => !disabled && onGuess(pokemon.id)}
         >
           {pokemon.name} {pokemon.id}
         </li>
