@@ -31,7 +31,9 @@ export const Game = ({
   useEffect(() => {
     const timeout = setTimeout(() => {
       setShowPokemon(false);
-      setCurrentQuiz((currentQuiz) => currentQuiz + 1);
+      if (pokedex.length > 0) {
+        setCurrentQuiz((currentQuiz) => currentQuiz + 1);
+      }
     }, 2000);
 
     return () => clearTimeout(timeout);
