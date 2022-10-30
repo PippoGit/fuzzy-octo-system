@@ -1,4 +1,5 @@
 import type { Pokemon } from "..";
+import { Button } from "./Button";
 
 export const Choices = ({
   pokemons,
@@ -16,18 +17,10 @@ export const Choices = ({
   return (
     <ul className="grid grid-cols-2 gap-4">
       {pokemons.map((pokemon) => (
-        <li
-          className="p-2 capitalize hover:translate-y-px"
-          role="button"
-          style={{
-            borderImage: `url('/assets/frame.png') 42 round`,
-            borderWidth: "21px",
-            borderStyle: "solid",
-          }}
-          key={pokemon.id}
-          onClick={() => !disabled && onGuess(pokemon.id)}
-        >
-          {pokemon.name} {pokemon.id}
+        <li key={pokemon.id}>
+          <Button className="w-60 capitalize" onClick={() => !disabled && onGuess(pokemon.id)}>
+            {pokemon.name}
+          </Button>
         </li>
       ))}
     </ul>
