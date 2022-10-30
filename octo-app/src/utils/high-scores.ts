@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 type HighScore = number;
 
@@ -8,6 +8,11 @@ const highScoresAtom = atomWithStorage<HighScore[]>('highScores', []);
 
 export function useHighScores() {
   const [highScores, setHighScores] = useAtom(highScoresAtom);
+  const [deferedHighScores, setDeferedHighScores] = useState<HighScore[]>([]);
+
+  useEffect(() => {
+    setDeferedHighScores(highScores);
+  }, [highScores]);
 
   const addHighScore = useCallback(
     (highScore: number) => {
@@ -26,5 +31,5 @@ export function useHighScores() {
     [setHighScores]
   );
 
-  return { highScores, addHighScore };
+  return { highScores: deferedHighScores, addHighScore };
 }

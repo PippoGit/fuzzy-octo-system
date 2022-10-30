@@ -4,8 +4,6 @@ import { useHighScores } from "../utils/high-scores"
 const HighScores: NextPage = () => {
   const { highScores } = useHighScores();
 
-  console.log(highScores);
-
   return (
     <div className="container mx-auto flex flex-col items-center justify-center p-4">
       <h1 className="text-4xl font-bold text-center mb-8 min-w-80">High Scores</h1>
@@ -14,7 +12,7 @@ const HighScores: NextPage = () => {
           No high scores yet, go catch em all!
         </p>
       ) : (
-        <ol className="list-decimal text-right" suppressHydrationWarning={true}>
+        <ol className="list-decimal text-right">
           {highScores.map((highScore, index) => (
             <li key={index} className="w-96">
               <span className="w-full">{highScore}</span>

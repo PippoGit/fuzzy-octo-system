@@ -13,7 +13,6 @@ export const pokeFont = localFont({ src: "../fonts/Pokemon.ttf" });
 
 export default function Layout({ children }: Props) {
   const { pathname } = useRouter();
-  console.log(pathname);
 
   return (
     <>
