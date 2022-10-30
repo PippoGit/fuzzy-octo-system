@@ -55,8 +55,9 @@ const Home: NextPage = () => {
     refetchOnWindowFocus: false,
   });
 
+
   const pokemonList = useMemo(() => {
-    if (!data) return [];
+    if (!data || data.length < MAX_POKEDEX_NO) return [];
     return _.shuffle(data);
   }, [data]);
 
