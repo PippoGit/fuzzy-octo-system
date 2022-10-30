@@ -51,7 +51,7 @@ const initGame = async () => {
 };
 
 const Home: NextPage = () => {
-  const { isLoading, data, isFetching } = useQuery(["pokemon"], initGame, {
+  const { isLoading, data } = useQuery(["pokemon"], initGame, {
     refetchOnWindowFocus: false,
   });
 
