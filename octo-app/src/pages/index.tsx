@@ -1,20 +1,21 @@
+import localFont from "@next/font/local";
 import { type NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-import localFont from '@next/font/local';
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Game } from "./components/Game";
+import _ from "lodash";
 
+export const pokeFont = localFont({ src: "../fonts/Pokemon.ttf" });
 
-export const pokeFont = localFont({ src: '../fonts/Pokemon.ttf', });
-
-
-interface Pokemon {
+export interface Pokemon {
+  id: number;
   name: string;
   sprite: string;
 }
 
-interface PokemonApi {
+export interface PokemonApi {
+  id: number;
   name: string;
   url: string;
 }
@@ -24,45 +25,32 @@ interface PokeApiList {
   results: PokemonApi[];
 }
 
-const fetchPokemon = async () => {
-  const pokeApiList = await fetch(
-    "https://pokeapi.co/api/v2/pokemon?limit=150&offset=0"
+const MAX_POKEDEX_NO = 150;
+const MAX_CHOICES = 4;
+
+const initGame = async () => {
+  const pokemonList: Pokemon[] = [];
+  const apiListRes = await fetch(
+    `https://pokeapi.co/api/v2/pokemon?limit=${MAX_POKEDEX_NO}&offset=0`
   );
-
-  const guessList: Pokemon[] = [];
-
-  const fullList = (await pokeApiList.json()) as PokeApiList;
-  const randomPokemon = Math.floor(Math.random() * 150);
-  const apiList = fullList.results.slice(randomPokemon, randomPokemon + 4);
+  const apiList = (await apiListRes.json()) as PokeApiList;
 
   await Promise.all(
-    apiList.map(async (pokemon) => {
-      const res = await fetch(pokemon.url);
+    apiList.results.map(async (pokeApi) => {
+      const res = await fetch(pokeApi.url);
       const data = await res.json();
-      guessList.push({
+      pokemonList.push({
+        id: data.id,
         name: data.name,
         sprite: data.sprites.front_default,
       });
     })
   );
-
-  return guessList;
+  return pokemonList;
 };
 
 const Home: NextPage = () => {
-  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [pokemonToGuess, setPokemonToGuess] = useState<Pokemon>();
-  const [isOver, setIsOver] = useState(false);
-
-  useEffect(() => {
-    setIsOver(false);
-    const fetchData = async () => {
-      const response = await fetchPokemon();
-      setPokemons(response);
-      setPokemonToGuess(response[Math.floor(Math.random() * 4)]);
-    };
-    fetchData();
-  }, [isOver]);
+  const { isLoading, data } = useQuery(["pokemon"], initGame);
 
   return (
     <>
@@ -72,46 +60,20 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={"container mx-auto flex min-h-screen flex-col items-center justify-center p-4 " + pokeFont.className}>
+      <main
+        className={
+          "container mx-auto flex min-h-screen flex-col items-center justify-center p-4 " +
+          pokeFont.className
+        }
+      >
         <h1 className="text-5xl font-extrabold leading-normal text-black md:text-[5rem]">
           PokéQuiz
         </h1>
         <p className="text-2xl text-gray-700">{"Who's That Pokemon?"}</p>
-        {pokemonToGuess && pokemons.length === 4 && (
-          <div className="align-center container flex flex-col items-center">
-            <Image
-              src={pokemonToGuess.sprite}
-              alt="guess"
-              width={400}
-              height={400}
-              style={{
-                filter: "brightness(0%)",
-                imageRendering: "pixelated",
-              }}
-            />
-            <ul className="grid grid-cols-2 gap-4">
-              {pokemons.map((pokemon) => (
-                <li
-                  className="p-2 capitalize hover:translate-y-px"
-                  role="button"
-                  style={{
-                    borderImage: `url('/assets/frame.png') 42 round`,
-                    borderWidth: '21px',
-                    borderStyle: 'solid',
-                  }}
-                  key={pokemon.name}
-                  onClick={() => {
-                    if (pokemon.name === pokemonToGuess?.name) {
-                      alert("You Win!");
-                      setIsOver(true);
-                    }
-                  }}
-                >
-                  {pokemon.name}
-                </li>
-              ))}
-            </ul>
-          </div>
+        {!data || isLoading ? (
+          <p>loading...</p>
+        ) : (
+          <Game pokemonList={_.shuffle(data)} numChoices={MAX_CHOICES} />
         )}
       </main>
     </>
