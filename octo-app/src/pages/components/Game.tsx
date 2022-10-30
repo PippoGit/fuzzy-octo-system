@@ -1,7 +1,8 @@
 import _ from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Pokemon } from "..";
 import { Choices } from "./Choices";
+import { CorrectGuess } from "./CorrectGuess";
 import { Pokedex } from "./Pokedex";
 import { PokemonToGuess } from "./PokemonToGuess";
 
@@ -13,6 +14,7 @@ export const Game = ({
   numChoices: number;
 }) => {
   const [isGameOver, setIsGameOver] = useState(false);
+  const [guessRight, setGuessRight] = useState(false);
   const [currentQuiz, setCurrentQuiz] = useState(0);
   const [pokedex, setPokedex] = useState<number[]>([]);
   const [showPokemon, setShowPokemon] = useState(false);
@@ -28,32 +30,33 @@ export const Game = ({
 
   const pokemonToGuess = pokemonList[currentQuiz];
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setShowPokemon(false);
-      if (pokedex.length > 0) {
-        setCurrentQuiz((currentQuiz) => currentQuiz + 1);
-      }
-    }, 2000);
-
-    return () => clearTimeout(timeout);
-  }, [pokedex]);
-
   if (!pokemonToGuess) return null;
 
   return (
     <div className="align-center container flex flex-col items-center">
       <Pokedex pokedex={pokedex} total={pokemonList.length} />
-      {isGameOver && (
-        <div> Oh no! That was a {pokemonToGuess.name}. Game over... </div>
-      )}
       <PokemonToGuess pokemon={pokemonToGuess} show={showPokemon} />
+      <div className="mb-8">
+        {isGameOver && (
+          <div> Oh no! That was a {pokemonToGuess.name}. Game over... </div>
+        )}
+        {guessRight && (
+          <CorrectGuess
+            onGetNext={() => {
+              setGuessRight(false);
+              setShowPokemon(false);
+              setCurrentQuiz((old) => old + 1);
+            }}
+          />
+        )}
+      </div>
       <Choices
         pokemons={getRandomPokemonOptions}
         onGuess={(id) => {
           setShowPokemon(true);
           if (id === pokemonToGuess.id) {
             setPokedex((old) => [...old, pokemonToGuess.id]);
+            setGuessRight(true);
           } else {
             setIsGameOver(true);
           }

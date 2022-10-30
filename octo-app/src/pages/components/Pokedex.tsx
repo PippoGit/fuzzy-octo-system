@@ -6,8 +6,8 @@ export const Pokedex = ({
   total: number;
 }) => {
   return (
-    <div>
-      you catched {pokedex.length}/{total}
+    <div className={"mt-4"}>
+      Pokedex: {pokedex.length}/{total}
     </div>
   );
 };
