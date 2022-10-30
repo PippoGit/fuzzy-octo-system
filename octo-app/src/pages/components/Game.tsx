@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import type { Pokemon } from "..";
+import { Button } from "./Button";
 import { Choices } from "./Choices";
 import { CorrectGuess } from "./CorrectGuess";
 import { Pokedex } from "./Pokedex";
@@ -37,37 +38,58 @@ export const Game = ({
     return <YouWin />;
   }
 
+  const resetGame = () => {
+    setIsGameOver(false);
+    setGuessRight(false);
+    setCurrentQuiz(0);
+    setPokedex([]);
+    setShowPokemon(false);
+  }
+
   return (
     <div className="align-center container flex flex-col items-center">
       <Pokedex pokedex={pokedex} total={pokemonList.length} />
       <PokemonToGuess pokemon={pokemonToGuess} show={showPokemon} />
-      <div className="mb-8">
-        {isGameOver && (
-          <div> Oh no! That was a {pokemonToGuess.name}. Game over... </div>
-        )}
-        {guessRight && (
-          <CorrectGuess
-            onGetNext={() => {
-              setGuessRight(false);
-              setShowPokemon(false);
-              setCurrentQuiz((old) => old + 1);
+      {isGameOver ? (
+        <>
+          <p className="text-center mb-4">
+            Oh no! That was a <span className="capitalize">{pokemonToGuess.name}</span>.
+          </p>
+          <p className="text-center mb-8">
+            You got {pokedex.length} Pokémons. 
+          </p>
+          <Button onClick={resetGame}>
+            Start a new Game
+          </Button>
+        </>
+      ) : (
+        <>
+          <div className="mb-8">
+            {guessRight && (
+              <CorrectGuess
+                onGetNext={() => {
+                  setGuessRight(false);
+                  setShowPokemon(false);
+                  setCurrentQuiz((old) => old + 1);
+                }}
+              />
+            )}
+          </div>
+          <Choices
+            pokemons={getRandomPokemonOptions}
+            onGuess={(id) => {
+              setShowPokemon(true);
+              if (id === pokemonToGuess.id) {
+                setPokedex((old) => [...old, pokemonToGuess.id]);
+                setGuessRight(true);
+              } else {
+                setIsGameOver(true);
+              }
             }}
+            disabled={isGameOver}
           />
-        )}
-      </div>
-      <Choices
-        pokemons={getRandomPokemonOptions}
-        onGuess={(id) => {
-          setShowPokemon(true);
-          if (id === pokemonToGuess.id) {
-            setPokedex((old) => [...old, pokemonToGuess.id]);
-            setGuessRight(true);
-          } else {
-            setIsGameOver(true);
-          }
-        }}
-        disabled={isGameOver}
-      />
+        </>
+      )}
     </div>
   );
 };
